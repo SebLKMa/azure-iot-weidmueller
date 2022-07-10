@@ -1,0 +1,23 @@
+# Here are the steps for build script:
+# CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gohttpsh gohttp.go
+# docker build -t gohttpsh-alpine -f Dockerfile.alpinesh .
+# docker run -p 8181:8181 gohttpsh-alpine:latest
+# docker run -p 8181:8181 --rm -it --entrypoint=/bin/sh gohttpsh-alpine:latest
+# My docker basics - https://github.com/sebmacisco/cisco-iox-go/tree/master/gosafeentry/gateway
+# docker run -d -p 8181:8181 --entrypoint=/bin/sh sebregistry.azurecr.io/gohttpsh:0.0.1
+# docker exec -i -t <containerId/Name> /bin/sh
+FROM alpine:latest
+
+# dockerfile best practices
+#RUN apt-get update && apt-get install -y \
+#    curl \
+# && rm -rf /var/lib/apt/lists/*
+# Adding curl
+RUN apk update && apk upgrade && \ 
+    apk add curl
+
+RUN mkdir /app
+WORKDIR /app
+COPY gohttpsh .
+EXPOSE 8181
+CMD [ "/bin/sh"]

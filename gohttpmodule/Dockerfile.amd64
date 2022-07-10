@@ -1,0 +1,30 @@
+# Here are the steps for build script:
+# CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gohttpamd64 gohttp.go
+# docker build -t gohttpamd64-alpine -f Dockerfile.amd64 .
+# sudo docker run -p 8181:8181 --entrypoint=/bin/sh sebregistry.azurecr.io/gohttp:0.0.1-amd64
+# sudo docker run -p 8181:8181 --rm -it --entrypoint=/bin/sh sebregistry.azurecr.io/gohttp:0.0.1-amd64
+# My docker basics - https://github.com/sebmacisco/cisco-iox-go/tree/master/gosafeentry/gateway
+# docker run [-d] -p 8181:8181 gohttpamd64-alpine:latest
+# See https://docs.docker.com/storage/volumes/
+# docker run -p 8181:8181 --name gohttp --mount source=gohttpvol,target=/data gohttpamd64-alpine:latest
+# docker container stop gohttp
+# docker container rm gohttp
+# docker volume rm gohttpvol
+# docker exec -i -t gohttp /bin/sh
+# docker run -p 8181:8181 --name gohttp --mount source=gohttpvol,target=/data --rm -it --entrypoint=/bin/sh gohttpamd64-alpine:latest
+
+FROM alpine:latest
+
+# dockerfile best practices
+#RUN apt-get update && apt-get install -y \
+#    curl \
+# && rm -rf /var/lib/apt/lists/*
+# Adding curl
+RUN apk update && apk upgrade && \ 
+    apk add curl
+
+RUN mkdir /app
+WORKDIR /app
+COPY gohttpamd64 .
+EXPOSE 8181
+CMD ["./gohttpamd64"]

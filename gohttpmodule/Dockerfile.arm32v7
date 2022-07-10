@@ -1,0 +1,28 @@
+# Here are the steps for build script:
+# GOOS=linux GOARCH=arm GOARM=5 go build -o gohttparm32 gohttp.go
+# docker build -t gohttparm32-alpine -f Dockerfile.arm32v7 .
+# sudo docker run -p 8181:8181 --entrypoint=/bin/sh sebregistry.azurecr.io/gohttp:0.0.1-arm32
+# sudo docker run -p 8181:8181 --rm -it --entrypoint=/bin/sh sebregistry.azurecr.io/gohttp:0.0.1-arm32
+# My docker basics - https://github.com/sebmacisco/cisco-iox-go/tree/master/gosafeentry/gateway
+# docker run -d -p 8181:8181 sebregistry.azurecr.io/gohttp:0.0.1-arm32
+# docker exec -i -t <containerId/Name> /bin/sh
+# docker run [-d] -p 8181:8181 gohttpamd64-alpine:latest
+# docker run -p 8181:8181 --name gohttp --mount source=gohttpvol,target=/data gohttpamd64-alpine:latest
+#
+# update version <0.0.x> tag before az build
+# az acr build -t sebregistry.azurecr.io/gohttp:<0.0.2>-arm32 -r sebregistry . -f Dockerfile.arm32v7 --platform linux/arm/v7
+FROM alpine:latest
+
+# dockerfile best practices
+#RUN apt-get update && apt-get install -y \
+#    curl \
+# && rm -rf /var/lib/apt/lists/*
+# Adding curl
+RUN apk update && apk upgrade && \ 
+    apk add curl
+
+RUN mkdir /app
+WORKDIR /app
+COPY gohttparm32 .
+EXPOSE 8181
+CMD ["./gohttparm32"]
